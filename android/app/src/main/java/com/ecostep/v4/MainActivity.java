@@ -1,5 +1,4 @@
-package com.ecostep;
-
+package com.ecostep.v4;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;

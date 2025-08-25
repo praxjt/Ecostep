@@ -1,6 +1,12 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+package="com.ecostep.v4" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />  //changes 
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> //changes
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> //changes
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> //changes
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
       android:name=".MainApplication"
@@ -20,6 +26,13 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+         <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="ecostep" />
+            </intent-filter>
       </activity>
+ <service android:name="com.xebia.activityrecognition.DetectionService"/>
     </application>
 </manifest>
