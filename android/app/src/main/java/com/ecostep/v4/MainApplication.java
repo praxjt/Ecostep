@@ -10,7 +10,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
-import com.xebia.activityrecognition.RNActivityRecognitionPackage; //  for activity recognition
+// import com.xebia.activityrecognition.RNActivityRecognitionPackage; //  for activity recognition
 import java.util.List;
 
 

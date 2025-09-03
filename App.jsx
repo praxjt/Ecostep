@@ -95,7 +95,6 @@ console.log("res!!!!!!!!! ",res)
       throw new Error('Invalid token response from server');
     }
 
-    // Optionally update Keychain or return the tokens
      await Keychain.setGenericPassword(wallet, JSON.stringify({
       accessToken,
       refreshToken,

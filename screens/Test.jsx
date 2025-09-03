@@ -37,7 +37,7 @@ socket.current.emit("message", "Hello!");
 setUpdateIntervalForType(SensorTypes.accelerometer, 100); // defaults to 100ms
 accelSubRef.current  = accelerometer.subscribe(({ x, y, z, timestamp }) =>{
 socket.current.emit('sensorData', { type: 'acc', x, y, z })
-  // console.log("accelo",{ x, y, z, })
+  console.log("accelo",{ x, y, z, })
 
 
 }
@@ -45,7 +45,7 @@ socket.current.emit('sensorData', { type: 'acc', x, y, z })
   setUpdateIntervalForType(SensorTypes.gyroscope, 100);
     gyroSubRef.current = gyroscope.subscribe(({ x, y, z, timestamp }) => {
     socket.current.emit('sensorData', { type: 'gyro', x, y, z })
-      // console.log("GYRO:", { x, y, z });
+      console.log("GYRO:", { x, y, z });
     });
   setIsCollecting(true);
    

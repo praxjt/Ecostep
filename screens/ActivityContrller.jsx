@@ -18,53 +18,15 @@ export default function ActivityController() {
   // const [distanceKm, setDistanceKm] = useState(0);
   // const subscriptionRef = useRef(null);
 
-  // Permission request for Android
-//   useEffect(() => {
-//   let subscription;
+  const activitySubRef = useRef(null);
+  const startedRef = useRef(false);
 
-//   const startActivityDetection = async () => {
-//     if (Platform.OS === 'android') {
-//       const granted = await PermissionsAndroid.requestMultiple([
-//         PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION,
-//         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-//       ]);
-
-//       if (
-//         granted[PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION] !== PermissionsAndroid.RESULTS.GRANTED ||
-//         granted[PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION] !== PermissionsAndroid.RESULTS.GRANTED
-//       ) {
-//         console.warn('Activity or location permission not granted');
-//         return;
-//       }
-//     }
-
-//     console.log('▶ Starting activity detection...');
-//     await ActivityRecognition.start(1000);
-//     // await ActivityRecognition.startMocked(1000,true);
-//   if (subscription) {
-//     subscription.remove();
-//   }
-//     subscription = ActivityRecognition.subscribe(activities => {
-//       console.log('Raw activities:', activities);
-// if (!activities || activities.length === 0) {
-//     console.warn('No activities detected yet');
-//     return;
-//   }
-// const probable = activities[0]||{}
-//   console.log('Most probable:', probable,probable?.type);
-
-//   if (probable?.type === ActivityRecognition.ANDROID_IN_VEHICLE) {
-//     console.log('🚗 User is in a vehicle');
-//   }    });
-//   };
-
-//   startActivityDetection();
-
-//   return () => {
-//     subscription?.remove?.();
-//     ActivityRecognition.stop();
-//   };
-// }, []);
+  
+  const startRecording = async () => {
+    if (startedRef.current) {
+      return;
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -91,7 +53,7 @@ export default function ActivityController() {
 
           <TouchableOpacity
             onPress={() => {
-              console.log(`Save pressed. Distance: ${distanceKm.toFixed(2)} km`);
+              // console.log(`Save pressed. Distance: ${distanceKm.toFixed(2)} km`);
               setShowActionContainer(false);
               setIsPaused(true);
             }}

@@ -6,10 +6,10 @@ buildscript {
         minSdkVersion = 24
         compileSdkVersion = 34
         targetSdkVersion = 34
-
         // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
         ndkVersion = "23.1.7779620"
         kotlinVersion = "1.9.22"
+        googlePlayServicesVersion = "16.0.1"
     }
     repositories {
         google()
@@ -27,5 +27,12 @@ allprojects {
     resolutionStrategy {
       force 'androidx.fragment:fragment:1.6.1' 
     }
+     resolutionStrategy{
+      force "com.google.android.gms:play-services-analytics:16.0.1"
+      force "com.google.android.gms:play-services-tagmanager-v4-impl:16.0.1"
+				// react-native-device-info
+        force "com.google.android.gms:play-services-gcm:15.0.0"
+     }
+       
   }
 }

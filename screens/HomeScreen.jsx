@@ -1,18 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect, useRef }   from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
 import  ActivityCards from './ActivityCards';
-import ActivityController from './ActivityContrller';
+import ActivityController from './ModalLoginScreen';
+import ErrorBox from './ErrorBox';
 import Test from './Test';
+import { Use } from 'react-native-svg';
 const { width } = Dimensions.get('window');
 const SIZE = width * 0.6
 
 const ScoreGauge = ({ score = 6.1, max = 10 }) => {
-  const percentage = (score / max) * 100;
 
+  const[errorMessage, setErrorMessage]= useState(null);
+  const [errorKey, setErrorKey] = useState(0);
+  const percentage = (score / max) * 100;
+ const handleError = (msg) => {
+    setErrorMessage(msg);
+    setErrorKey(prev => prev + 1);
+ }
   return (
     <View style={styles.container}>
        <View style={styles.walletContainer}>
@@ -51,8 +59,9 @@ const ScoreGauge = ({ score = 6.1, max = 10 }) => {
         )}
       </AnimatedCircularProgress>
       {/* <ActivityCards/> */}
-      <ActivityController/>
-      <Test/>
+      <ActivityController onError={handleError}/>
+      <ErrorBox key={errorKey} error={errorMessage}/>
+      {/* <Test/> */}
     </View>
   );
 };

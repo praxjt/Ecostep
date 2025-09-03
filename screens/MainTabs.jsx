@@ -9,6 +9,7 @@ import { useSDK } from '@metamask/sdk-react-native';
 import { useConnection } from '../contexts/ConnectionContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import ExploreScreen from './ExploreScreen';
 
 
 // import SettingsScreen from './SettingsScreen'; // optional
@@ -169,6 +170,7 @@ const switchNetwork = async () => {
   screenOptions={({ route }) => ({
     headerShown: false,
     tabBarShowLabel: false,
+    tabBarHideOnKeyboard: true,
     tabBarStyle: {
       height: 60,
     },
@@ -179,6 +181,9 @@ const switchNetwork = async () => {
         iconName = 'home'; 
       } else if (route.name === 'Account') {
         iconName = 'user'; 
+      }
+      else if (route.name === 'Explore') {
+        iconName = 'compass';
       }
 
       return (
@@ -222,6 +227,8 @@ const switchNetwork = async () => {
   })}
 >
   <Tab.Screen name="Home" component={HomeScreen} />
+  <Tab.Screen name="Explore" component={ExploreScreen} />
+
   <Tab.Screen name="Account" component={AccountScreen} />
 </Tab.Navigator>
 

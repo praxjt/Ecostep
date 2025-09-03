@@ -32,6 +32,7 @@ import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalLoginScreen from './ModalLoginScreen';
 import ModalLoginScratch from "./ModalLoginScratch"
+import AuthenticateScreen from './AuthenticateScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ActivityIndicatorComponent from './ActivityIndicator'
 import { useConnection } from '../contexts/ConnectionContext';
@@ -157,9 +158,9 @@ selectedAddress,
 const storeWalletAddress = async (address) => {
   try {
     await AsyncStorage.setItem('walletAddress', address);
-    console.log('✅ Wallet address saved');
+    console.log(' Wallet address saved');
   } catch (e) {
-    console.error('❌ Failed to save wallet address:', e);
+    console.error(' Failed to save wallet address:', e);
   }
 };
   useEffect(() => {
@@ -472,7 +473,6 @@ return(
         >
           <Text style={styles.connectText}>CONNECT</Text>
         </TouchableOpacity>
-    </View>
 
 {/* 
         {connected && (
@@ -495,7 +495,7 @@ return(
   connect={connect}/> */}
 
 
-<ModalLoginScratch 
+<AuthenticateScreen 
 // initialconnectStatus={initialconnectStatus}
   // intialsiweStatus={intialsiweStatus}
   isSigningIn={isSigningIn}
@@ -514,6 +514,8 @@ retryAfter={retryAfter}
 setopenmetamask={setopenmetamask}
   setRetryAfter={setRetryAfter}
 />
+    </View>
+
 
   </SafeAreaView>
 </GestureHandlerRootView>
@@ -668,6 +670,7 @@ connectButton: {
   marginVertical: 10,
   opacity: 1,
   // elevation: 99,
+  zIndex :20
 },
 
 connectText: {
