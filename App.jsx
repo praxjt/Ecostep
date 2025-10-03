@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { AppState } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
-import LandingScreen from './screens/LandingScreen'; 
-import MainTabs from './screens/MainTabs';
+import LandingScreen from './src/screens/LandingScreen'; 
+
+import MainTabs from './src/screens/MainTabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import { SiweMessage } from 'siwe';
 import { NavigationContainer,createNavigationContainerRef  } from '@react-navigation/native';
@@ -29,7 +30,7 @@ export default function App() {
 
 
   const appState = useRef(AppState.currentState);
- const { sdk, connected, connecting, provider, chainId, account } = useSDK();
+ const { sdk, connected, connecting, provider, chainId, account } = useConnection();
 
 
   // const { sdk, connected, connecting, provider, chainId, account } = useSDK();
@@ -63,11 +64,12 @@ const loadWalletAddress = async () => {
 };
 
   useEffect(() => {
+    SplashScreen.hide();
   const refreshTokenRequest = async (wallet, deviceId, oldRefreshToken) => {
-console.log("  refresh-token is called")
+console.log("refresh-token is called")
 
   try {
-    const res = await fetch('http://192.168.1.7:3001/refresh-token', {
+    const res = await fetch('http://192.168.1.4:3001/refresh-token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -136,7 +138,8 @@ console.log("retrivedAddress",retrivedAddress)
 
   throw new Error('Wallet mismatch — aborting session check',storedWallet);
 }
-      const res = await fetch('http://192.168.1.7:3001/login', {
+
+      const res = await fetch('http://192.168.1.4:3001/login', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -161,7 +164,7 @@ const { newAccessToken,
       refreshToken
     );
 
-          const retryRes = await fetch('http://192.168.1.7:3001/login', {
+          const retryRes = await fetch('http://192.168.1.4:3001/login', {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${newAccessToken}`,
@@ -211,14 +214,14 @@ console.log("efewfw",retryRes)
   }
 }, [sdk,deviceId]);
 
-  if (!initialRoute) {
-    console.log("app is not ready spin|||");
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
-  }
+  // if (!initialRoute) {
+  //   console.log("app is not ready spin|||");
+  //   return (
+  //     // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+  //     //   <ActivityIndicator size="large" color="#000" />
+  //     // </View>
+  //   );
+  // }
 
 async function getSafeDeviceId() {
   try {
@@ -233,6 +236,7 @@ async function getSafeDeviceId() {
     //   <Stack.Screen name="Landing" component={LandingScreen} />
     //   <Stack.Screen name="Main" component={MainTabs} />
     // </Stack.Navigator>
+    <ConnectionProvider>
      <NavigationContainer >
  <Stack.Navigator  initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
  
@@ -241,5 +245,7 @@ async function getSafeDeviceId() {
       <Stack.Screen name="Main" component={MainTabs} />
     </Stack.Navigator>
      </NavigationContainer>
+    </ConnectionProvider>
+
   )
 }

@@ -17,7 +17,7 @@ const socket = useRef(null);
 const startCollection = () => {
 
   if (accelSubRef.current || gyroSubRef.current) return; 
- socket.current =io("http://192.168.1.7:3003")
+ socket.current =io("http://192.168.1.2:3003")
  
  socket.current.on("prediction", (data) => {
     console.log("Prediction:", data);

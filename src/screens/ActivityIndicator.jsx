@@ -18,7 +18,7 @@ export default function ActivityIndicatorComponent() {
       justifyContent: 'center',
       alignItems: 'center',
     }}>
-      <ActivityIndicator size="large" color="red" />
+      <ActivityIndicator size="large" color="black" />
     </View>
   );
 }

@@ -39,7 +39,7 @@ package="com.ecostep.v4" >
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="ecostep" />
+                <data android:scheme="ecostep"/>
             </intent-filter>
       </activity>
  <service android:name="com.xebia.activityrecognition.DetectionService"/>
