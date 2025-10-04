@@ -17,7 +17,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import FAB from '@fengzie/react-native-animated-fab';
 import DynamicForm from '@coffeebeanslabs/react-native-form-builder';
 
-import ModalLoginScratch from './ModalLoginScratch';  
+import ModalLoginScratch from '../../components/ModalLoginScratch';  
 const { height,width } = Dimensions.get('window');
 
 const BottomsheetFormModal = ({translationY, visiblePosition, modalHeight }) => {

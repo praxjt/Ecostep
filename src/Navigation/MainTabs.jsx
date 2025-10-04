@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import HomeScreen from './HomeScreen';
-import AccountScreen from './AccountScreen';
+import HomeScreen from '../screens/Home/HomeScreen';
+import AccountScreen from '../screens/Profile/AccountScreen';
 import {
   Alert,
   Modal,
@@ -15,10 +15,10 @@ import {
 console.log('HomeScreen:', HomeScreen);
 console.log('AccountScreen:', AccountScreen);
 import {useSDK} from '@metamask/sdk-react-native';
-import {useConnection} from '../../contexts/ConnectionContext';
+// import {useConnection} from '../../contexts/ConnectionContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import ExploreScreen from './ExploreScreen';
+import ExploreScreen from '../screens/Explore/ExploreScreen';
 
 // import SettingsScreen from './SettingsScreen'; // optional
 

@@ -9,15 +9,15 @@ import {
 } from 'react-native';
 import { AppState } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
-import LandingScreen from './src/screens/LandingScreen'; 
+import LandingScreen from './src/screens/Authentication/LandingScreen'; 
 
-import MainTabs from './src/screens/MainTabs';
+import MainTabs from './src/Navigation/MainTabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import { SiweMessage } from 'siwe';
 import { NavigationContainer,createNavigationContainerRef  } from '@react-navigation/native';
 import { useSDK } from '@metamask/sdk-react-native';
-import { ConnectionProvider } from './contexts/ConnectionContext';
-import { useConnection } from './contexts/ConnectionContext';
+import { ConnectionProvider } from './src/contexts/ConnectionContext';
+import { useConnection } from './src/contexts/ConnectionContext';
 import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import AsyncStorage from '@react-native-async-storage/async-storage';

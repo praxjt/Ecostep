@@ -4,10 +4,9 @@ import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LottieView from 'lottie-react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import ActivityCards from './ActivityCards';
-import ActivityController from './ModalLoginScreen';
-import ErrorBox from './ErrorBox';
-import Test from './Test';
+import ActivityController from '../ActivityContrller';
+import ErrorBox from '../../components/ErrorBox';
+import Test from '../Test';
 import {Use} from 'react-native-svg';
 const {width, height} = Dimensions.get('window');
 const SIZE = width * 0.6;
@@ -65,7 +64,7 @@ const ScoreGauge = ({score = 6.1, max = 10}) => {
       </AnimatedCircularProgress> */}
 
       <LottieView
-        source={require('../lottie/Lottiecircle.json')}
+        source={require('../../lottie/Lottiecircle.json')}
         style={{width: width * 0.8, height: width * 0.8}}
         autoPlay
         loop
