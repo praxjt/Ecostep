@@ -30,13 +30,13 @@ import {useNavigation} from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ModalLoginScreen from './ModalLoginScreen';
-import ModalLoginScratch from './ModalLoginScratch';
+// import ModalLoginScreen from './ModalLoginScreen';
+// import ModalLoginScratch from './ModalLoginScratch';
 import AuthenticateScreen from './AuthenticateScreen';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import ActivityIndicatorComponent from './ActivityIndicator';
+// import ActivityIndicatorComponent from '../components/ActivityIndicator';
 import {useConnection} from '../../contexts/ConnectionContext';
-import OrbitingCircles from './OrbitingCircles';
+import OrbitingCircles from '../../components/OrbitingCircles';
 import LinearGradient from 'react-native-linear-gradient';
 
 const {height} = Dimensions.get('window');
@@ -61,8 +61,8 @@ export default function LandingScreen() {
   // const[intialsiweStatus ,setintialsiweStatus ] = useState(false);  //  writ or wrong
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [phase, setPhase] = useState('connect');
-  const [SendsiweMessage, setSiweMessage] = useState(null);
-
+  // const [SendsiweMessage, setSiweMessage] = useState(null);
+const siweMessageRef = useRef(null);
   const [openmetamask, setopenmetamask] = useState(true);
   const [retryAfter, setRetryAfter] = useState(null);
   const [currentChainId, setChainId] = useState(null);
@@ -102,6 +102,12 @@ export default function LandingScreen() {
     console.log('sdk:', sdk);
     console.log('provider:', provider);
   }, [sdk, provider]);
+  // useEffect(() => {
+//   if (SendsiweMessage!==null) {
+//     console.log("State updated with SIWE message:", SendsiweMessage);
+//   }
+
+// }, [SendsiweMessage]);
   const openModal = () => {
     requestAnimationFrame(() => {
       // Wait for layout to be fully mounted
@@ -234,9 +240,16 @@ export default function LandingScreen() {
         // setModalVisible(false);
         // setinitialconnectStatus(true)  //  blac or green
         // setHasAttemptedConnect(false)
-        setSiweMessage(json.message);
+        console.log("jsonn",typeof json.message);
+        const siweMsg = json.message;
+        siweMessageRef.current = siweMsg;   
+console.log("Stored SIWE message:", siweMessageRef.current);
+
+        // setSiweMessage(siweMsg);
         console.log('SendsiweMessage:', json.message);
+        // console.log("SendsiweMessage type:",SendsiweMessage);
         setPhase('connectAndSign');
+        await connectAndSign();
       }
     } catch (err) {
       if (err.message && err.message.includes('User rejected')) {
@@ -265,18 +278,32 @@ export default function LandingScreen() {
   // Optional: Reconnect on resume
   const connectAndSign = async () => {
     // setIsSigningIn(true); ---------------commented out
+//     const nonce = Math.random().toString(36).substring(2, 15);
+// const issuedAt = new Date().toISOString();
+
+// const message = `
+// Ecostep wants you to sign in with your Ethereum account:
+
+// Sign in with Ethereum to Ecostep.
+
+// URI: http://ecostep.com
+// Version: 1
+// Chain ID: ${chainId}
+// Nonce: ${nonce}
+// Issued At: ${issuedAt}
+// `;
 
     try {
-      console.log('Connecting and signing with SIWE.43#@%%#%%%@%@#%..', SendsiweMessage);
+      console.log('Connecting and signing with SIWE.43#@%%#%%%@%@#%..', typeof  siweMessageRef.current, siweMessageRef.current);
 
-      const signature = await sdk.connectAndSign({msg: SendsiweMessage});
+      const signature = await sdk.connectAndSign({msg:  siweMessageRef.current});
       setHasAttemptedSign(true);
       console.log("Signature received from MetaMask:", signature);
 
       const verifyRes = await fetch('http://192.168.1.4:3001/verify', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({message: SendsiweMessage, signature, deviceId}),
+        body: JSON.stringify({message:  siweMessageRef.current, signature, deviceId}),
       });
 
       const {ok, address, accessToken, refreshToken} = await verifyRes.json();
@@ -311,7 +338,8 @@ export default function LandingScreen() {
         // setintialsiweStatus(true)  //  black or green
 
         setPhase('connect');
-        setSiweMessage(null);
+        // setSiweMessage(null);
+        siweMessageRef.current = null;
         setTimeout(() => {
           setIsSigningIn(false);
           navigation.replace('Main');
