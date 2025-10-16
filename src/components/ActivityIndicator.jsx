@@ -10,7 +10,7 @@ import {  View,
   Image,
   Dimensions,
 }  from 'react-native'; 
-export default function ActivityIndicatorComponent() {
+export default function ActivityIndicatorComponent({color}) {
        return (
      <View style={{
       height: "100%",
@@ -18,7 +18,7 @@ export default function ActivityIndicatorComponent() {
       justifyContent: 'center',
       alignItems: 'center',
     }}>
-      <ActivityIndicator size="large" color="black" />
+      <ActivityIndicator size="large" color={color} />
     </View>
   );
 }

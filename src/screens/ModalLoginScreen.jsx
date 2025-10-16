@@ -14,9 +14,9 @@ import {
   startStepCounterUpdate,
   stopStepCounterUpdate,
 } from '@dongminyu/react-native-step-counter';
-// import Geolocation from '@react-native-community/geolocation';
 
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Geolocation from 'react-native-geolocation-service';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function ActivityController({onError}) {

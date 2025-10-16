@@ -99,22 +99,7 @@ export default function AuthenticateScreen({
         <>
           <Text style={styles.modalTitle}>Choose Wallet</Text>
 
-          {/* <FlatList
-                           data={wallets}
-                           keyExtractor={(item) => item.name}
-                           numColumns={3}
-                           contentContainerStyle={styles.walletGrid}
-                           renderItem={({ item }) => (
-                             <TouchableOpacity
-                               style={styles.walletGridItem}
-            onPress={phase === "connect" ? connect : connectAndSign }
-                               activeOpacity={0.7}
-                             >
-                               <Image source={{ uri: item.icon }} style={styles.walletIcon} />
-                               <Text style={styles.walletText}>{item.name}</Text>
-                             </TouchableOpacity>
-                           )}
-                         /> */}
+      
 
           <View style={styles.walletGrid}>
             {wallets.map(item => (

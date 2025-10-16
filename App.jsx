@@ -20,6 +20,7 @@ import { ConnectionProvider } from './src/contexts/ConnectionContext';
 import { useConnection } from './src/contexts/ConnectionContext';
 import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ActivityIndicatorComponent from './src/components/ActivityIndicator';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 console.log('LandingScreen:', LandingScreen);
@@ -65,11 +66,115 @@ const loadWalletAddress = async () => {
 
   useEffect(() => {
     SplashScreen.hide();
+
+  
+  const checkSession = async () => {
+    if (!sdk ||!deviceId||hasCheckedSession.current) return;
+hasCheckedSession.current = true;
+    try {
+    
+
+      const creds = await Keychain.getGenericPassword();
+      console.log("creds",creds)
+
+       if (!creds) {
+      console.log(" No stored tokens yet — skipping session check");
+      SplashScreen.hide();
+      setInitialRoute('Landing');     
+
+
+      return;
+    }
+console.log("creds",creds)
+      const storedWallet = creds.username;
+
+      const { accessToken, refreshToken } = JSON.parse(creds.password);
+      console.log("refreshed token sent when we accestoken is ",refreshToken)
+const retrivedAddress= await loadWalletAddress()
+console.log("retrivedAddress",retrivedAddress)
+     if (!retrivedAddress || storedWallet !== retrivedAddress) {
+  console.log('Wallet mismatch — aborting session check',storedWallet);
+
+  throw new Error('Wallet mismatch — aborting session check',storedWallet);
+}
+
+      const res = await fetch('http://192.168.1.5:3001/login', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'x-device-id': deviceId,
+          'x-user-address': retrivedAddress,
+        },
+      });
+
+      if (res.ok) {
+        console.log('Session active — setting route to Main');
+        setInitialRoute('Main');
+      } else if (res.status === 401) {
+         const body = await res.json();
+  console.log ('Access token expired',body.error,)
+        console.log(' Token expired, attempting refresh...');
+        try{
+          // const newAccessToken = await refreshTokenRequest(storedWallet.toLowerCase(), deviceId, refreshToken);
+const { newAccessToken,newRefreshToken } = await refreshTokenRequest(
+  storedWallet,deviceId,refreshToken
+    );
+
+          const retryRes = await fetch('http://192.168.1.5:3001/login', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${newAccessToken}`,
+              'x-device-id': deviceId,
+              'x-user-address': retrivedAddress,
+            },
+          });
+console.log("retryRes",retryRes)
+          if (retryRes.ok) {
+            console.log(' Session active after refresh');
+            setInitialRoute('Main');
+          } else {
+            console.log('Invalid even after refresh');
+            setInitialRoute('Landing');
+             await sdk?.terminate();
+              await AsyncStorage.removeItem('walletAddress');
+  await Keychain.resetGenericPassword?.();
+
+          }
+        } catch (refreshError) {
+          console.warn(' Refresh failed:', refreshError);
+          setInitialRoute('Landing');
+        }
+      } else {
+           console.log(' res',res);
+        setInitialRoute('Landing');
+      }
+    } catch (err) {
+      // if (err.message?.includes('User rejected')) {   --commented to test 
+      //   console.warn('User Rejected:', err);
+      //   sdk?.terminate();
+      //   setHasAttemptedConnect(false);
+      //   return;
+      // }
+  sdk?.terminate();
+      console.error(' Session check failed:', err);
+      // setconnectStatus(false);
+      // setHasAttemptedConnect(true);
+      setInitialRoute('Landing');
+    } finally {
+      SplashScreen.hide();
+    }
+  };
+
+  if (sdk &&deviceId) {
+    // setTimeout(checkSession, 100); --commented to test
+    checkSession();
+  }
+}, [sdk,deviceId]);
   const refreshTokenRequest = async (wallet, deviceId, oldRefreshToken) => {
 console.log("refresh-token is called")
 
   try {
-    const res = await fetch('http://192.168.1.4:3001/refresh-token', {
+    const res = await fetch('http://192.168.1.5:3001/refreshtoken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -96,7 +201,8 @@ console.log("res!!!!!!!!! ",res)
     if (!accessToken || !refreshToken) {
       throw new Error('Invalid token response from server');
     }
-
+//Access Token --short lived
+//Refresh Token --long lived
      await Keychain.setGenericPassword(wallet, JSON.stringify({
       accessToken,
       refreshToken,
@@ -109,134 +215,29 @@ console.log("res!!!!!!!!! ",res)
 };
 
 
-  
-
-  const checkSession = async () => {
-    if (!sdk ||!deviceId||hasCheckedSession.current) return;
-hasCheckedSession.current = true;
-    try {
+  if (!initialRoute) {  //this condition  solved the  issue of 
+    console.log("app is not ready spin|||");
+    return (
     
-
-      const creds = await Keychain.getGenericPassword();
-      console.log("creds",creds)
-
-       if (!creds) {
-      console.log(" No stored tokens yet — skipping session check");
-      SplashScreen.hide();
-      setInitialRoute('Landing');
-      return;
-    }
-console.log("creds",creds)
-      const storedWallet = creds.username;
-
-      const { accessToken, refreshToken } = JSON.parse(creds.password);
-      console.log("refreshed token sent when we accestoken is ",refreshToken)
-const retrivedAddress= await loadWalletAddress()
-console.log("retrivedAddress",retrivedAddress)
-     if (!retrivedAddress || storedWallet !== retrivedAddress) {
-  console.log('Wallet mismatch — aborting session check',storedWallet);
-
-  throw new Error('Wallet mismatch — aborting session check',storedWallet);
-}
-
-      const res = await fetch('http://192.168.1.4:3001/login', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'x-device-id': deviceId,
-          'x-user-address': retrivedAddress,
-        },
-      });
-
-      if (res.ok) {
-        console.log('Session active — setting route to Main');
-        setInitialRoute('Main');
-      } else if (res.status === 401) {
-         const body = await res.json();
-  console.log (body.error,'Access token expired')
-        console.log(' Token expired, attempting refresh...');
-        try {
-          // const newAccessToken = await refreshTokenRequest(storedWallet.toLowerCase(), deviceId, refreshToken);
-const { newAccessToken,
-   newRefreshToken } = await refreshTokenRequest(
-      storedWallet,
-      deviceId,
-      refreshToken
+      <ActivityIndicatorComponent color="#ffffffff" />   
     );
-
-          const retryRes = await fetch('http://192.168.1.4:3001/login', {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${newAccessToken}`,
-              'x-device-id': deviceId,
-              'x-user-address': retrivedAddress,
-            },
-          });
-console.log("efewfw",retryRes)
-          if (retryRes.ok) {
-            console.log(' Session active after refresh');
-            setInitialRoute('Main');
-          } else {
-            console.log('Invalid even after refresh');
-            setInitialRoute('Landing');
-             await sdk?.terminate();
-              await AsyncStorage.removeItem('walletAddress');
-  await Keychain.resetGenericPassword?.();
-
-          }
-        } catch (refreshError) {
-          console.warn(' Refresh failed:', refreshError);
-          setInitialRoute('Landing');
-        }
-      } else {
-           console.log(' res',res);
-        setInitialRoute('Landing');
-      }
-    } catch (err) {
-      if (err.message?.includes('User rejected')) {
-        console.warn('User Rejected:', err);
-        sdk?.terminate();
-        setHasAttemptedConnect(false);
-        return;
-      }
-  sdk?.terminate();
-      console.error(' Session check failed:', err);
-      // setconnectStatus(false);
-      // setHasAttemptedConnect(true);
-      setInitialRoute('Landing');
-    } finally {
-      SplashScreen.hide();
-    }
-  };
-
-  if (sdk &&deviceId) {
-    setTimeout(checkSession, 100);
   }
-}, [sdk,deviceId]);
 
-  // if (!initialRoute) {
-  //   console.log("app is not ready spin|||");
-  //   return (
-  //     // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //     //   <ActivityIndicator size="large" color="#000" />
-  //     // </View>
-  //   );
-  // }
-
-async function getSafeDeviceId() {
-  try {
-    return await DeviceInfo.getUniqueId();
-  } catch (err) {
-    console.warn(' Could not get device ID:', err);
-    return null;
-  }
-}
+// async function getSafeDeviceId() {
+//   try {
+//     return await DeviceInfo.getUniqueId();
+//   } catch (err) {
+//     console.warn(' Could not get device ID:', err);
+//     return null;
+//   }
+// }
   return ( 
     //  <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
     //   <Stack.Screen name="Landing" component={LandingScreen} />
     //   <Stack.Screen name="Main" component={MainTabs} />
     // </Stack.Navigator>
-    <ConnectionProvider>
+   
+    // <ConnectionProvider>   --commented to test
      <NavigationContainer >
  <Stack.Navigator  initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
  
@@ -245,7 +246,7 @@ async function getSafeDeviceId() {
       <Stack.Screen name="Main" component={MainTabs} />
     </Stack.Navigator>
      </NavigationContainer>
-    </ConnectionProvider>
+    // </ConnectionProvider>
 
   )
 }

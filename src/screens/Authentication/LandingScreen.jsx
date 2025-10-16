@@ -108,61 +108,7 @@ const siweMessageRef = useRef(null);
 //   }
 
 // }, [SendsiweMessage]);
-  const openModal = () => {
-    requestAnimationFrame(() => {
-      // Wait for layout to be fully mounted
-      setTimeout(() => {
-        if (modalizeRef.current) {
-          try {
-            modalizeRef.current.open();
-          } catch (e) {
-            console.warn('Modalize open failed', e);
-          }
-        }
-      }, 100); // 100ms is usually safe
-    });
-  };
 
-  // const checkSession = async () => {
-  //   try {
-  //     // console.log('check for conected or diconnected',connected);
-
-  //     setLoading(true);
-
-  //     const selectedaddress = await provider.getSelectedAddress();
-  //     console.log('Checking session...', selectedaddress);
-  //     console.log('account', account);
-  //     // const [address] = await sdk.connect(); // triggers silent connect
-  //     const res = await fetch('://192.168.1.4:3001/login', {
-  //       headers: {'x-user-address': selectedaddress},
-  //     });
-  //     console.log('Response :', res);
-  //     if (res.ok) {
-  //       console.log('Session active — redirecting');
-
-  //       navigation.replace('Main');
-
-  //       // setconnectStatus(true)
-  //     } else {
-  //       console.log('No active session. Stay on login screen.');
-  //       //  setinitialconnectStatus(true);  //  black or green
-  //       setPhase('connect');
-  //       setSiweMessage(null);
-  //       // setintialsiweStatus(false);  //  writ or wrong
-  //       // setconnectStatus(false)
-
-  //       sdk?.terminate();
-  //     }
-  //   } catch (err) {
-  //     console.log('Session check error:', err);
-  //     sdk?.terminate();
-  //     // setinitialconnectStatus(true)
-  //     // setconnectStatus(false)
-  //   } finally {
-  //     setLoading(false);
-  //     SplashScreen.hide();
-  //   }
-  // };
   const StoreChainId = async chainId => {
     if (!chainId) {
       console.error(' Invalid chain ID provided:', chainId);
@@ -206,7 +152,7 @@ const siweMessageRef = useRef(null);
         console.log(' await provider.getChainId(); :', chainId);
         setChainId(chainId);
         StoreChainId(chainId);
-        const res = await fetch('http://192.168.1.4:3001/auth-request', {
+        const res = await fetch('http://192.168.1.5:3001/connect', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({address, chainId, deviceId}),
@@ -300,7 +246,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
       setHasAttemptedSign(true);
       console.log("Signature received from MetaMask:", signature);
 
-      const verifyRes = await fetch('http://192.168.1.4:3001/verify', {
+      const verifyRes = await fetch('http://192.168.1.5:3001/siwe', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({message:  siweMessageRef.current, signature, deviceId}),
@@ -422,26 +368,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
             <Text style={styles.connectText}>CONNECT</Text>
           </TouchableOpacity>
 
-          {/* 
-        {connected && (
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.address}>Chain ID: {chainId}</Text>
-            <Text style={styles.address}>Account: {account}</Text>
-            <Button title="Disconnect" onPress={disconnect} />
-          </View>
-        )} */}
-
-          {/* <Modal style={styles.modal} visible={modalVisible} transparent animationType="slide"> */}
-          {/* <ModalLoginScreen  
-   initialconnectStatus={initialconnectStatus}
-  intialsiweStatus={intialsiweStatus}
-  connectStatus={connectStatus}
-  siwestatus={siwestatus}
-  phase={phase}
-  modalizeRef={modalizeRef}
-  connectAndSign={connectAndSign}
-  connect={connect}/> */}
-
+         
           <AuthenticateScreen
             // initialconnectStatus={initialconnectStatus}
             // intialsiweStatus={intialsiweStatus}

@@ -88,11 +88,11 @@ const ExporeScreen =()=>{
       {modalVisible && (
           <>
           <Pressable style={styles.overlay} onPress={hideModal} /> 
-      <BottomsheetFormModal  
+      {/* <BottomsheetFormModal  
        translationY={translationY}
         visiblePosition={visiblePosition}
         modalHeight={modalHeight}
-        />
+        /> */}
         </>
       )}
         </SafeAreaView>

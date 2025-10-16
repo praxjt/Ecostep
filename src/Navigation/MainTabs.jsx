@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+
 import HomeScreen from '../screens/Home/HomeScreen';
 import AccountScreen from '../screens/Profile/AccountScreen';
 import {
@@ -26,7 +27,6 @@ const Tab = createBottomTabNavigator();
 export default function MainTabs({route}) {
   const userChainId = route?.params?.userChainId;
   console.log('userchinid ', userChainId);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [fetchedChainId, setFetchedChainId] = useState(null);
   const [fetchedChainName, setFetchedChainName] = useState(null);
@@ -139,7 +139,7 @@ export default function MainTabs({route}) {
       setModalVisible(false);
       setFetchedChainId('80002');
       const afterSwitch = await provider.getChainId();
-      console.log('✅ After switch chain:', afterSwitch);
+      console.log(' After switch chain:', afterSwitch);
     } catch (err) {
       console.warn('Chain switch failed:', err);
       // setModalVisible(true)

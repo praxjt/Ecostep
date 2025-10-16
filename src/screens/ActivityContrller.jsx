@@ -10,6 +10,13 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 // import ActivityRecognition from 'react-native-activity-recognition';
 // console.log('ActivityRecognition:', ActivityRecognition);
+
+import Geolocation from 'react-native-geolocation-service';
+import {hasLocationPermission} from './LocationPermission';
+
+console.log('Geolocation:', Geolocation);
+
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function ActivityController() {
@@ -25,7 +32,25 @@ export default function ActivityController() {
   const startRecording = async () => {
     if (startedRef.current) {
       return;
+
     }
+     const granted = await hasLocationPermission(); 
+    if (!granted) {
+      console.log('Location permission not granted');
+      return;
+    }
+
+    console.log(' Location permission granted, ');
+    startedRef.current = true;
+     Geolocation.getCurrentPosition(
+        (position) => {
+          console.log(position);
+        },
+        (error) => {
+          console.log(error.code, error.message);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 } 
+    );
   }
 
   return (
@@ -35,6 +60,7 @@ export default function ActivityController() {
           onPress={() => {
             setShowActionContainer(true);
             setIsPaused(false);
+           startRecording();  //got errro "Could not invoke RNFusedLocation.getCurrentPosition
           }}
         >
           <FontAwesome name="play" size={30} color="white" />
@@ -43,7 +69,9 @@ export default function ActivityController() {
 
       {showActionContainer && (
         <View style={styles.actionBox}>
-          <TouchableOpacity onPress={() => setIsPaused(!isPaused)}>
+          <TouchableOpacity onPress={() => {setIsPaused(!isPaused)
+            console.log("pppppp")
+          } }>
             <FontAwesome
               name={isPaused ? 'play' : 'pause'}
               size={30}
@@ -53,7 +81,7 @@ export default function ActivityController() {
 
           <TouchableOpacity
             onPress={() => {
-              // console.log(`Save pressed. Distance: ${distanceKm.toFixed(2)} km`);
+              console.log(`Save pressed. Distance:  km`);
               setShowActionContainer(false);
               setIsPaused(true);
             }}
