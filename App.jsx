@@ -1,16 +1,14 @@
 
-import React, { useEffect,useState,useRef } from 'react';
+import  { useEffect,useState,useRef } from 'react';
 import {
   View,
   ActivityIndicator ,
-
-
-  
 } from 'react-native';
 import { AppState } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import LandingScreen from './src/screens/Authentication/LandingScreen'; 
-
+import { ToastProviderWithViewport } from './components/toast';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MainTabs from './src/Navigation/MainTabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import { SiweMessage } from 'siwe';
@@ -34,48 +32,64 @@ export default function App() {
  const { sdk, connected, connecting, provider, chainId, account } = useConnection();
 
 
-  // const { sdk, connected, connecting, provider, chainId, account } = useSDK();
   const sdkRef = useRef(sdk);
   const providerRef = useRef(provider);
  const [isAppReady, setIsAppReady] = useState(false);
    const [initialRoute, setInitialRoute] = useState(null);
    const [selectedAddress,setselectedAddress]=useState(null)
    const hasCheckedSession = useRef(false);
+
+   const [accessToken, setAccessToken] = useState(null);
+const [refreshToken, setRefreshToken] = useState(null);
  const {
     setHasAttemptedConnect,
 setconnectStatus ,
-deviceId,
+
 
 
 
   } = useConnection();   
  
-const loadWalletAddress = async () => {
-  try {
-    const address = await AsyncStorage.getItem('walletAddress');
-    if (address) {
-      console.log(' Retrieved wallet address:', address);
-      return address;
-    }
-    return null;
-  } catch (e) {
-    console.error(' Failed to load wallet address:', e);
-    return null;
-  }
-};
 
   useEffect(() => {
+   const runCheck = async () => {
+    try {
+      console.log("checkSession started");
+      const creds = await Keychain.getGenericPassword({ service:'tokens'});
+      // console.log("creds33", creds);
+
+      if (!creds) {
+        console.log("No stored tokens, going to Landing");
+        setInitialRoute("Landing");
+        return;
+      }
+
+    } catch(e) {
+      console.error("checkSession error:", e);
+      setInitialRoute("Landing");
+    } finally {
+      SplashScreen.hide();
+    }
+  };
+
+  // runCheck();
+
+
+
     SplashScreen.hide();
 
   
   const checkSession = async () => {
-    if (!sdk ||!deviceId||hasCheckedSession.current) return;
+
+    console.log("checkSession is called ")
+    if ( hasCheckedSession.current) return;
 hasCheckedSession.current = true;
     try {
     
 
-      const creds = await Keychain.getGenericPassword();
-      console.log("creds",creds)
+      const creds = await Keychain.getGenericPassword({service:'tokens'});
+
+ 
 
        if (!creds) {
       console.log(" No stored tokens yet — skipping session check");
@@ -85,25 +99,25 @@ hasCheckedSession.current = true;
 
       return;
     }
+
 console.log("creds",creds)
-      const storedWallet = creds.username;
+      // const storedWallet = creds.username;
+         const {username, password} = creds;
 
-      const { accessToken, refreshToken } = JSON.parse(creds.password);
+      const { accessToken, refreshToken } = JSON.parse(password);
       console.log("refreshed token sent when we accestoken is ",refreshToken)
-const retrivedAddress= await loadWalletAddress()
-console.log("retrivedAddress",retrivedAddress)
-     if (!retrivedAddress || storedWallet !== retrivedAddress) {
-  console.log('Wallet mismatch — aborting session check',storedWallet);
 
-  throw new Error('Wallet mismatch — aborting session check',storedWallet);
-}
+//      if (!retrivedAddress || storedWallet !== retrivedAddress) {
+//   console.log('Wallet mismatch — aborting session check',storedWallet);
 
-      const res = await fetch('http://192.168.1.5:3001/login', {
+//   throw new Error('Wallet mismatch — aborting session check',storedWallet);
+// }
+
+      const res = await fetch('http://192.168.1.12:3001/login', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'x-device-id': deviceId,
-          'x-user-address': retrivedAddress,
+          'x-user-address': username,
         },
       });
 
@@ -116,16 +130,25 @@ console.log("retrivedAddress",retrivedAddress)
         console.log(' Token expired, attempting refresh...');
         try{
           // const newAccessToken = await refreshTokenRequest(storedWallet.toLowerCase(), deviceId, refreshToken);
-const { newAccessToken,newRefreshToken } = await refreshTokenRequest(
-  storedWallet,deviceId,refreshToken
-    );
 
-          const retryRes = await fetch('http://192.168.1.5:3001/login', {
+          const latestCreds = await Keychain.getGenericPassword({ service: 'tokens' });
+if (!latestCreds) {
+  console.log('No stored tokens for refresh');
+  setInitialRoute('Landing');
+  return;
+}
+const { username: latestUsername, password: latestPassword } = latestCreds;
+const { refreshToken: latestRefreshToken } = JSON.parse(latestPassword);
+
+const { newAccessToken,newRefreshToken } = await refreshTokenRequest(
+  latestUsername, latestRefreshToken
+);
+
+          const retryRes = await fetch('http://192.168.1.12:3001/login', {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${newAccessToken}`,
-              'x-device-id': deviceId,
-              'x-user-address': retrivedAddress,
+              'x-user-address': latestUsername,
             },
           });
 console.log("retryRes",retryRes)
@@ -155,7 +178,7 @@ console.log("retryRes",retryRes)
       //   setHasAttemptedConnect(false);
       //   return;
       // }
-  sdk?.terminate();
+  // sdk?.terminate();
       console.error(' Session check failed:', err);
       // setconnectStatus(false);
       // setHasAttemptedConnect(true);
@@ -165,16 +188,17 @@ console.log("retryRes",retryRes)
     }
   };
 
-  if (sdk &&deviceId) {
+  // if (sdk ) {
     // setTimeout(checkSession, 100); --commented to test
     checkSession();
-  }
-}, [sdk,deviceId]);
-  const refreshTokenRequest = async (wallet, deviceId, oldRefreshToken) => {
+  // }
+}, []);
+
+  const refreshTokenRequest = async (wallet, oldRefreshToken) => {
 console.log("refresh-token is called")
 
   try {
-    const res = await fetch('http://192.168.1.5:3001/refreshtoken', {
+    const res = await fetch('http://192.168.1.12:3001/refreshtoken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -182,7 +206,8 @@ console.log("refresh-token is called")
       body: JSON.stringify({
         wallet,
         refreshToken: oldRefreshToken,
-        deviceId,
+        // role:"USER"
+        
       }),
     });
 console.log("res!!!!!!!!! ",res)
@@ -198,6 +223,7 @@ console.log("res!!!!!!!!! ",res)
     console.log(' Token refresh response:', result);
 
     const { accessToken, refreshToken } = result;
+    console.log("accessToken,refreshToken",accessToken,refreshToken)
     if (!accessToken || !refreshToken) {
       throw new Error('Invalid token response from server');
     }
@@ -223,28 +249,21 @@ console.log("res!!!!!!!!! ",res)
     );
   }
 
-// async function getSafeDeviceId() {
-//   try {
-//     return await DeviceInfo.getUniqueId();
-//   } catch (err) {
-//     console.warn(' Could not get device ID:', err);
-//     return null;
-//   }
-// }
+
   return ( 
-    //  <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
-    //   <Stack.Screen name="Landing" component={LandingScreen} />
-    //   <Stack.Screen name="Main" component={MainTabs} />
-    // </Stack.Navigator>
-   
-    // <ConnectionProvider>   --commented to test
+ 
+    // <ConnectionProvider>
      <NavigationContainer >
- <Stack.Navigator  initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+      <SafeAreaProvider>
+      <ToastProviderWithViewport>
+ <Stack.Navigator  initialRouteName={initialRoute}  screenOptions={{ headerShown: false }}>
  
       <Stack.Screen name="Landing" component={LandingScreen} />
 
       <Stack.Screen name="Main" component={MainTabs} />
     </Stack.Navigator>
+    </ToastProviderWithViewport>
+    </SafeAreaProvider>
      </NavigationContainer>
     // </ConnectionProvider>
 

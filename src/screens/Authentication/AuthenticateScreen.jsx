@@ -26,6 +26,7 @@ import {
 const {height} = Dimensions.get('window');
 import {useConnection} from '../../contexts/ConnectionContext';
 import ModalLoginScratch from '../../components/ModalLoginScratch';
+import SpinnerButton from "react-native-spinner-button";
 
 export default function AuthenticateScreen({
   // initialconnectStatus,
@@ -33,8 +34,8 @@ export default function AuthenticateScreen({
   isSigningIn,
   phase,
   modalizeRef,
-  connectAndSign,
   connect,
+  connectAndSign,
   translationY,
   height,
   visiblePosition,
@@ -61,8 +62,10 @@ export default function AuthenticateScreen({
     siwestatus,
     setsiwestatus,
   } = useConnection();
+console.log("connectStatus,siwestatus,hasAttemptedSign:",connectStatus,siwestatus,hasAttemptedSign);
 
   useEffect(() => {
+
     if (retryAfter === null) return;
     if (retryAfter <= 0) {
       setopenmetamask(true);
@@ -74,6 +77,8 @@ export default function AuthenticateScreen({
     }, 1000);
     return () => clearInterval(timer);
   }, [retryAfter]);
+const signComplete = connectStatus && siwestatus && hasAttemptedSign;
+
   return (
     <ModalLoginScratch
       translationY={translationY}
@@ -93,9 +98,27 @@ export default function AuthenticateScreen({
                          </View>
            
                          </TouchableOpacity> */}
-      {isSigningIn ? (
-        <ActivityIndicatorComponent />
-      ) : (
+      {isSigningIn ? 
+      // (
+        // <ActivityIndicatorComponent />
+{/* <SpinnerButton
+  animationType="ripple-effect"
+  animatedDuration={500}
+  rippleColor="rgba(255,255,255,0.3)"
+  spinnerColor="white"
+  isLoading={true}
+  buttonStyle={{
+    backgroundColor:"#893346",
+    paddingHorizontal:25,
+    paddingVertical:12,
+    borderRadius:10
+  }}
+>
+  {/* <Text style={{color:"white", fontSize:17}}>Connecting...</Text> 
+</SpinnerButton> */}
+      // ) 
+      // : 
+      (
         <>
           <Text style={styles.modalTitle}>Choose Wallet</Text>
 
@@ -106,7 +129,7 @@ export default function AuthenticateScreen({
               <TouchableOpacity
                 key={item.name}
                 style={styles.walletGridItem}
-                onPress={connect}
+   onPress={phase === 'connect' ? connect : connectAndSign}
                 disabled={!openmetamask || retryAfter > 0}
                 activeOpacity={0.7}>
                 <Image source={{uri: item.icon}} style={styles.walletIcon} />
@@ -177,7 +200,23 @@ export default function AuthenticateScreen({
             </View>
           </View>
         </>
-      )}
+      ):<SpinnerButton
+  // animationType="default"
+  animatedDuration={500}
+  rippleColor="rgba(255,255,255,0.3)"
+  spinnerColor="#AAAAAA"
+  // SpinnerType ="UIActivityIndicator"
+  isLoading={true}
+  onPress={()=>{}}
+  buttonStyle={{
+    // backgroundColor:"#893346",
+    paddingHorizontal:25,
+    paddingVertical:12,
+    borderRadius:10
+  }}
+>
+</SpinnerButton>
+}
     </ModalLoginScratch>
   );
 }

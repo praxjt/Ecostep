@@ -28,6 +28,7 @@ import {WebView} from 'react-native-webview';
 import {useSDK} from '@metamask/sdk-react-native';
 import {useNavigation} from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
+import { getAddress } from "ethers";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import ModalLoginScreen from './ModalLoginScreen';
@@ -77,7 +78,6 @@ const siweMessageRef = useRef(null);
     setconnectStatus,
     siwestatus,
     setsiwestatus,
-    deviceId,
     setselectedAddress,
     selectedAddress,
   } = useConnection();
@@ -145,17 +145,20 @@ const siweMessageRef = useRef(null);
         //   params: [{ chainId: '0xe708' }],
         // });
         // console.log("Switching network response:", resq);
-        storeWalletAddress(address);
+        const checksumAddress =address;
+console.log("aaaaaaaaaadress", address)
+console.log("checksumAddress",checksumAddress)
+        storeWalletAddress(checksumAddress);
         setHasAttemptedConnect(true);
 
         const chainId = await provider.getChainId();
         console.log(' await provider.getChainId(); :', chainId);
         setChainId(chainId);
         StoreChainId(chainId);
-        const res = await fetch('http://192.168.1.5:3001/connect', {
+        const res = await fetch('http://192.168.1.12:3001/connect', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({address, chainId, deviceId}),
+          body: JSON.stringify({address:address, chainId:parseInt(chainId, 16), role:"USER"}),
         });
         console.log(' Response status:', res);
 
@@ -195,7 +198,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
         console.log('SendsiweMessage:', json.message);
         // console.log("SendsiweMessage type:",SendsiweMessage);
         setPhase('connectAndSign');
-        await connectAndSign();
+        // await connectAndSign();
       }
     } catch (err) {
       if (err.message && err.message.includes('User rejected')) {
@@ -244,29 +247,44 @@ console.log("Stored SIWE message:", siweMessageRef.current);
 
       const signature = await sdk.connectAndSign({msg:  siweMessageRef.current});
       setHasAttemptedSign(true);
+      setsiwestatus(true); //  write or wrong
+
       console.log("Signature received from MetaMask:", signature);
 
-      const verifyRes = await fetch('http://192.168.1.5:3001/siwe', {
+      const verifyRes = await fetch('http://192.168.1.12:3001/siwe', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({message:  siweMessageRef.current, signature, deviceId}),
+        body: JSON.stringify({message:  siweMessageRef.current, signature, }),
       });
 
       const {ok, address, accessToken, refreshToken} = await verifyRes.json();
-      // setintialsiweStatus(true)  //  black or green
+              setsiwestatus(true)  //  black or green  //  black or green
       // setinitialconnectStatus(true)
       // setIsSigningIn(true)    /// ------------
 
       if (ok && accessToken && refreshToken) {
         setIsSigningIn(true); /// ------------
+        setsiwestatus(true); //  write or wrong
+
+
 
         console.log('Login successful for', address);
-        await Keychain.setGenericPassword(
-          address, // username (optional)
-          JSON.stringify({accessToken, refreshToken}), // password field as a JSON string
-        );
-
-        const credentials = await Keychain.getGenericPassword();
+      try {
+  await Keychain.setGenericPassword(address, 
+    JSON.stringify(
+    { accessToken, refreshToken }),
+  {
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+    storage: Keychain.STORAGE_TYPE.AES,
+    service: 'tokens',                   
+  });
+  // const test = await Keychain.getGenericPassword({service:'tokens'});
+// console.log('Keychain test read after store:', test);
+  console.log('Tokens stored successfully');
+} catch (err) {
+  console.error('Failed to store tokens in Keychain:', err);
+}
+        const credentials = await Keychain.getGenericPassword({service:'tokens'});
 
         if (credentials) {
           const {username, password} = credentials;
@@ -281,7 +299,6 @@ console.log("Stored SIWE message:", siweMessageRef.current);
           console.log('No credentials stored in Keychain.');
         }
 
-        // setintialsiweStatus(true)  //  black or green
 
         setPhase('connect');
         // setSiweMessage(null);
@@ -330,7 +347,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
     console.log('Modal opening...');
 
     setHasAttemptedSign(false);
-    setsiwestatus(false);
+    // setsiwestatus(false);
 
     translationY.value = withTiming(visiblePosition, {
       duration: 500,
@@ -349,13 +366,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
           start={{x: 0, y: 0}}
           end={{x: 0, y: 1}}
           style={styles.animation}>
-          {/* <WebView
-        originWhitelist={['*']}
-        source={{ html: htmlContent }}
-        overScrollMode="never"
-        bounces={false}
-        style={styles.webview}
-      /> */}
+     
 
           <OrbitingCircles />
 
@@ -376,8 +387,8 @@ console.log("Stored SIWE message:", siweMessageRef.current);
             connectStatus={connectStatus}
             phase={phase}
             modalizeRef={modalizeRef}
-            connectAndSign={connectAndSign}
             connect={connect}
+            connectAndSign={connectAndSign}
             translationY={translationY}
             height={height}
             visiblePosition={visiblePosition}

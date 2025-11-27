@@ -185,9 +185,13 @@ export default function MainTabs({route}) {
 
             if (route.name === 'Home') {
               iconName = 'home';
-            } else if (route.name === 'Account') {
-              iconName = 'user';
-            } else if (route.name === 'Explore') {
+            } 
+            
+            // else if (route.name === 'Account') {
+            //   iconName = 'user';
+
+            // } 
+            else if (route.name === 'Explore') {
               iconName = 'compass';
             }
 
@@ -240,7 +244,7 @@ export default function MainTabs({route}) {
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Explore" component={ExploreScreen} />
 
-        <Tab.Screen name="Account" component={AccountScreen} />
+        {/* <Tab.Screen name="Account" component={AccountScreen} /> */}
       </Tab.Navigator>
 
       {/* Modal for chain switch */}
