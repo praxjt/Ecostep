@@ -20,11 +20,14 @@ import {useSDK} from '@metamask/sdk-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ExploreScreen from '../screens/Explore/ExploreScreen';
+import { useConnection } from '../contexts/ConnectionContext';
 
 // import SettingsScreen from './SettingsScreen'; // optional
 
 const Tab = createBottomTabNavigator();
 export default function MainTabs({route}) {
+    const { accessToken,wallet } = useConnection();
+  
   const userChainId = route?.params?.userChainId;
   console.log('userchinid ', userChainId);
   const [modalVisible, setModalVisible] = useState(false);
@@ -90,10 +93,10 @@ export default function MainTabs({route}) {
     }
     try {
       // const currentChainId = await provider.getChainId();
-      console.log('Provider:', provider);
+      console.log('Providercha:', provider);
       const currentChainId = await provider.getChainId();
 
-      // console.log('Provider:', currentChainId);
+      console.log('Provider:', currentChainId);
       // console.log('Current chain ID:!!!!!!***************!!!!!!!!!!!', currentChainId);
       console.log(
         'Connected: from @@@@@@@@@@@popupoutside',
@@ -248,7 +251,7 @@ export default function MainTabs({route}) {
       </Tab.Navigator>
 
       {/* Modal for chain switch */}
-      <Modal visible={modalVisible} transparent animationType="fade">
+      <Modal visible={false} transparent animationType="fade">
         <View style={styles.backdrop}>
           <View style={styles.modalBox}>
             <Text style={styles.title}>Unsupported Network</Text>
@@ -281,7 +284,7 @@ const styles = StyleSheet.create({
   },
   modalBox: {
     width: '85%',
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
@@ -292,13 +295,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#222',
+    color: '#000',
     marginBottom: 16,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#555',
+    color: '#000',
     marginBottom: 8,
     textAlign: 'center',
     lineHeight: 22,
@@ -309,13 +312,13 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-    backgroundColor: '#007aff',
+    backgroundColor: '#4bff01',
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: '600',
     fontSize: 16,
   },

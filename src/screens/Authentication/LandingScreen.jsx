@@ -54,8 +54,10 @@ export default function LandingScreen() {
   connecting,
   chainId,
   account,
+  loading,
+  setAccessToken,
+  setWallet,
 } = useConnection();
-  const [loading, setLoading] = useState(true);
   // const [SessionAddress, setAddress] = useState(null);
   // const [initialconnectStatus ,setinitialconnectStatus ] = useState(false);  // black or green
 
@@ -80,6 +82,8 @@ const siweMessageRef = useRef(null);
     setsiwestatus,
     setselectedAddress,
     selectedAddress,
+    accessToken,
+    wallet,
   } = useConnection();
 
   const storeWalletAddress = async address => {
@@ -90,6 +94,25 @@ const siweMessageRef = useRef(null);
       console.error(' Failed to save wallet address:', e);
     }
   };
+  function navigateBasedOnTokens() {
+    console.log("Tokens loaded, navigating to Main...,",accessToken,wallet,loading);
+
+    if(!loading) {
+       
+
+  if (accessToken && wallet) {
+    console.log("Tokens loaded, navigating to Main...");
+    setIsSigningIn(false);
+    navigation.replace('Main');
+  }
+  else{
+    console.log("No tokens found, staying on Landing screen.");
+  }
+}}
+  useEffect(() => {
+    navigateBasedOnTokens()
+
+}, [loading,accessToken, wallet, navigation]);
   useEffect(() => {
     if (!sdk && !provider) {
       return;
@@ -101,6 +124,7 @@ const siweMessageRef = useRef(null);
     console.log('Account:', account);
     console.log('sdk:', sdk);
     console.log('provider:', provider);
+    console.log("accessToken1213213,wallte",accessToken,wallet)
   }, [sdk, provider]);
   // useEffect(() => {
 //   if (SendsiweMessage!==null) {
@@ -265,12 +289,16 @@ console.log("Stored SIWE message:", siweMessageRef.current);
       if (ok && accessToken && refreshToken) {
         setIsSigningIn(true); /// ------------
         setsiwestatus(true); //  write or wrong
+        setAccessToken(accessToken)
+        setWallet(address)
 
 
 
         console.log('Login successful for', address);
-      try {
-  await Keychain.setGenericPassword(address, 
+  
+  
+        try {
+     await Keychain.setGenericPassword(address, 
     JSON.stringify(
     { accessToken, refreshToken }),
   {
@@ -284,6 +312,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
 } catch (err) {
   console.error('Failed to store tokens in Keychain:', err);
 }
+
         const credentials = await Keychain.getGenericPassword({service:'tokens'});
 
         if (credentials) {
@@ -295,6 +324,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
             accessToken,
             refreshToken,
           });
+
         } else {
           console.log('No credentials stored in Keychain.');
         }
@@ -303,10 +333,20 @@ console.log("Stored SIWE message:", siweMessageRef.current);
         setPhase('connect');
         // setSiweMessage(null);
         siweMessageRef.current = null;
-        setTimeout(() => {
-          setIsSigningIn(false);
-          navigation.replace('Main');
-        }, 3000);
+  //       setTimeout(() => {
+
+  //         // setIsSigningIn(false);
+  //         // navigation.replace('Main');
+
+  //          if (accessToken && wallet) {
+  //           console.log("ac,wallet",accessToken,wallet)
+  //         setIsSigningIn(false);
+  //   navigation.replace('Main');
+  // } else {
+  //   console.warn('Cannot navigate to Main: accessToken or wallet missing');
+  //   // Optionally retry or show an error message
+  // }
+  //       }, 3000);
       } else {
         console.warn('Verification failed:', {ok, accessToken, refreshToken});
         setIsSigningIn(false);

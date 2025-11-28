@@ -99,25 +99,25 @@ const signComplete = connectStatus && siwestatus && hasAttemptedSign;
            
                          </TouchableOpacity> */}
       {isSigningIn ? 
-      // (
+      (
         // <ActivityIndicatorComponent />
-{/* <SpinnerButton
-  animationType="ripple-effect"
+ <SpinnerButton
+  // animationType="default"
   animatedDuration={500}
   rippleColor="rgba(255,255,255,0.3)"
-  spinnerColor="white"
+  spinnerColor="#AAAAAA"
+  // SpinnerType ="UIActivityIndicator"
   isLoading={true}
+  onPress={()=>{}}
   buttonStyle={{
-    backgroundColor:"#893346",
     paddingHorizontal:25,
     paddingVertical:12,
     borderRadius:10
   }}
 >
-  {/* <Text style={{color:"white", fontSize:17}}>Connecting...</Text> 
-</SpinnerButton> */}
-      // ) 
-      // : 
+</SpinnerButton> 
+      ) 
+      : 
       (
         <>
           <Text style={styles.modalTitle}>Choose Wallet</Text>
@@ -200,22 +200,7 @@ const signComplete = connectStatus && siwestatus && hasAttemptedSign;
             </View>
           </View>
         </>
-      ):<SpinnerButton
-  // animationType="default"
-  animatedDuration={500}
-  rippleColor="rgba(255,255,255,0.3)"
-  spinnerColor="#AAAAAA"
-  // SpinnerType ="UIActivityIndicator"
-  isLoading={true}
-  onPress={()=>{}}
-  buttonStyle={{
-    // backgroundColor:"#893346",
-    paddingHorizontal:25,
-    paddingVertical:12,
-    borderRadius:10
-  }}
->
-</SpinnerButton>
+      )
 }
     </ModalLoginScratch>
   );

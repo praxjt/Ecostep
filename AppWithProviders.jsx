@@ -5,6 +5,9 @@ import { ConnectionProvider } from './src/contexts/ConnectionContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function AppInner() {
+  
+   
+
   return (
      <GestureHandlerRootView style={styles.container}>
     <ConnectionProvider>

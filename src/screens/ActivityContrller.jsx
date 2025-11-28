@@ -125,7 +125,7 @@ const goNextWeek = () => {
     return () => {
       socketRef.current.disconnect();
     };
-  }, []);
+  }, [accessToken,wallet]);
 
   const startRecording = async () => {
     if (startedRef.current) {

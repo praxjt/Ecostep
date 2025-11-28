@@ -17,50 +17,17 @@ const {width, height} = Dimensions.get('window');
 const SIZE = width * 0.6;
 
 const ScoreGauge = () => {
-  const { logout } = useConnection();
+  const { logout, accessToken, wallet } = useConnection();
   const [errorMessage, setErrorMessage] = useState(null);
   const [errorKey, setErrorKey] = useState(0);
      const [co2SavedperKg, setCo2SavedperKg] = useState(0.0);
      const [kmwalked,setkmwalked]=useState(0)
  useEffect(()=>{
-const logouttemp = async () => {
-  try {
-    console.log("LOGGING OUT…");
+    console.log("accessToken in HomeScreen:", accessToken);
+  console.log("wallet in HomeScreen:", wallet);
+    if (!accessToken) return; 
 
-    // 1. Delete SIWE tokens (accessToken + refreshToken)
-    await Keychain.resetGenericPassword();
-
-    // 2. Delete stored wallet info
-    await AsyncStorage.removeItem("walletAddress");
-    await AsyncStorage.removeItem("chainId");
-
-    // OPTIONAL: delete backend stored refresh token  
-    // (uncomment only if you added logout API)
-    /*
-    const refreshToken = JSON.parse(credentials.password).refreshToken;
-    await fetch("http://192.168.1.12:3001/logout", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken })
-    });
-    */
-
-    // 3. Disconnect MetaMask session
-    // sdk?.terminate();
-
-    // 4. Navigate to Landing (login) screen
-    // navigation.replace("Landing");
-
-    console.log("LOGOUT SUCCESS");
-
-  } catch (err) {
-    console.log("Logout error:", err);
-  }
-};
-
-
-// logout();
- },[])
+ },[  accessToken,wallet])
   const handleError = msg => {
     setErrorMessage(msg);
     setErrorKey(prev => prev + 1);
@@ -90,7 +57,7 @@ const logouttemp = async () => {
     >
         <View style={styles.walletLeft}>
 
-          <Icon name="wallet" size={22} color="black" />
+          <Icon name="logout" size={22} color="black" />
 
       <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>
         Logout

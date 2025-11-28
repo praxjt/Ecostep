@@ -29,7 +29,7 @@ export default function App() {
 
 
   const appState = useRef(AppState.currentState);
- const { sdk, connected, connecting, provider, chainId, account } = useConnection();
+ const { sdk, connected, connecting, provider, chainId, account ,accessToken,wallet } = useConnection();
 
 
   const sdkRef = useRef(sdk);
@@ -39,7 +39,6 @@ export default function App() {
    const [selectedAddress,setselectedAddress]=useState(null)
    const hasCheckedSession = useRef(false);
 
-   const [accessToken, setAccessToken] = useState(null);
 const [refreshToken, setRefreshToken] = useState(null);
  const {
     setHasAttemptedConnect,
@@ -52,27 +51,27 @@ setconnectStatus ,
  
 
   useEffect(() => {
-   const runCheck = async () => {
-    try {
-      console.log("checkSession started");
-      const creds = await Keychain.getGenericPassword({ service:'tokens'});
-      // console.log("creds33", creds);
+  //  const runCheck = async () => {
+  //   try {
+  //     console.log("checkSession started");
+  //     const creds = await Keychain.getGenericPassword({ service:'tokens'});
+  //     // console.log("creds33", creds);
 
-      if (!creds) {
-        console.log("No stored tokens, going to Landing");
-        setInitialRoute("Landing");
-        return;
-      }
+  //     if (!creds) {
+  //       console.log("No stored tokens, going to Landing");
+  //       setInitialRoute("Landing");
+  //       return;
+  //     }
 
-    } catch(e) {
-      console.error("checkSession error:", e);
-      setInitialRoute("Landing");
-    } finally {
-      SplashScreen.hide();
-    }
-  };
+  //   } catch(e) {
+  //     console.error("checkSession error:", e);
+  //     setInitialRoute("Landing");
+  //   } finally {
+  //     SplashScreen.hide();
+  //   }
+  // };
 
-  // runCheck();
+  // runCheck(); --commented to test
 
 
 
@@ -192,7 +191,7 @@ console.log("retryRes",retryRes)
     // setTimeout(checkSession, 100); --commented to test
     checkSession();
   // }
-}, []);
+}, [accessToken,wallet]);
 
   const refreshTokenRequest = async (wallet, oldRefreshToken) => {
 console.log("refresh-token is called")
@@ -253,7 +252,7 @@ console.log("res!!!!!!!!! ",res)
   return ( 
  
     // <ConnectionProvider>
-     <NavigationContainer >
+     <NavigationContainer ref={navigationRef} >
       <SafeAreaProvider>
       <ToastProviderWithViewport>
  <Stack.Navigator  initialRouteName={initialRoute}  screenOptions={{ headerShown: false }}>

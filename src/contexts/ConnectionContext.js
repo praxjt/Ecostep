@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState,useEffect } from 'react';
 
 import {useSDK} from '@metamask/sdk-react-native';
 import * as Keychain from 'react-native-keychain';
+import { navigationRef } from '../../App';
+import { View ,Text} from 'react-native';
+import SpinnerButton from "react-native-spinner-button";
 
 
 
@@ -30,6 +33,7 @@ useEffect(() => {
         if (creds) {
           const { username, password } = creds;
           const { accessToken, refreshToken } = JSON.parse(password);
+          console.log("tokens stored successfully!!!!!!!!!!!!!!!!",accessToken)
           setAccessToken(accessToken);
           setWallet(username); // wallet address
         }
@@ -56,14 +60,44 @@ useEffect(() => {
       setsiwestatus(false);
 
       if (connected && sdk) {
-        await sdk.disconnect();
+  sdk?.terminate();
+
       }
+       if (navigationRef.isReady()) {
+      navigationRef.reset({
+        index: 0,
+        routes: [{ name: 'Landing' }],
+      });
+    }
 
       console.log('User logged out successfully');
     } catch (err) {
       console.error('Logout error:', err);
     }
   };
+ if (loading) {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <SpinnerButton
+        // animationType="default"
+        animatedDuration={500}
+        rippleColor="rgba(255,255,255,0.3)"
+        spinnerColor="#AAAAAA"
+        // SpinnerType ="UIActivityIndicator"
+        isLoading={true}
+        onPress={()=>{}}
+        buttonStyle={{
+          paddingHorizontal:25,
+          paddingVertical:12,
+          borderRadius:10
+        }}
+      >
+      </SpinnerButton> 
+    </View>
+  );
+}
+
+
   return (
     <ConnectionContext.Provider value={{
        sdk,
@@ -86,7 +120,9 @@ useEffect(() => {
      accessToken, 
      wallet, 
      loading,
-    logout
+    logout,
+    setAccessToken,
+    setWallet,
      }}>
       {children}
     </ConnectionContext.Provider>
