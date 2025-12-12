@@ -1,39 +1,39 @@
-import React, { createContext, useContext, useState,useEffect } from 'react';
+import React, {createContext, useContext, useState, useEffect} from 'react';
 
 import {useSDK} from '@metamask/sdk-react-native';
 import * as Keychain from 'react-native-keychain';
-import { navigationRef } from '../../App';
-import { View ,Text} from 'react-native';
-import SpinnerButton from "react-native-spinner-button";
-
-
+import {navigationRef} from '../../App';
+import {View, Text} from 'react-native';
+import SpinnerButton from 'react-native-spinner-button';
 
 const ConnectionContext = createContext();
 
-export const ConnectionProvider = ({ children }) => {
-    const { sdk, connected, connecting, provider, chainId, account } = useSDK();
+export const ConnectionProvider = ({children}) => {
+  const {sdk, connected, connecting, provider, chainId, account} = useSDK();
 
- const [hasAttemptedConnect, setHasAttemptedConnect] = useState(false);
-const [connectStatus ,setconnectStatus ] = useState(false);   // write or wrong
+  const [hasAttemptedConnect, setHasAttemptedConnect] = useState(false);
+  const [connectStatus, setconnectStatus] = useState(false); // write or wrong
 
-const [hasAttemptedSign, setHasAttemptedSign] = useState(false);
+  const [hasAttemptedSign, setHasAttemptedSign] = useState(false);
 
-const [siwestatus,setsiwestatus]= useState(null); //    write or wrong
-   const [selectedAddress,setselectedAddress]=useState(null)
+  const [siwestatus, setsiwestatus] = useState(null); //    write or wrong
+  const [selectedAddress, setselectedAddress] = useState(null);
 
- const [accessToken, setAccessToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
 
-
-useEffect(() => {
+  useEffect(() => {
     const loadTokens = async () => {
       try {
-        const creds = await Keychain.getGenericPassword({ service: 'tokens' });
+        const creds = await Keychain.getGenericPassword({service: 'tokens'});
         if (creds) {
-          const { username, password } = creds;
-          const { accessToken, refreshToken } = JSON.parse(password);
-          console.log("tokens stored successfully!!!!!!!!!!!!!!!!",accessToken)
+          const {username, password} = creds;
+          const {accessToken, refreshToken} = JSON.parse(password);
+          console.log(
+            'tokens stored successfully!!!!!!!!!!!!!!!!',
+            accessToken,
+          );
           setAccessToken(accessToken);
           setWallet(username); // wallet address
         }
@@ -47,9 +47,9 @@ useEffect(() => {
   }, []);
 
   const logout = async () => {
-    console.log("loggdout")
+    console.log('loggdout');
     try {
-      await Keychain.resetGenericPassword({ service: 'tokens' });
+      await Keychain.resetGenericPassword({service: 'tokens'});
 
       setAccessToken(null);
       setWallet(null);
@@ -60,70 +60,67 @@ useEffect(() => {
       setsiwestatus(false);
 
       if (connected && sdk) {
-  sdk?.terminate();
-
+        sdk?.terminate();
       }
-       if (navigationRef.isReady()) {
-      navigationRef.reset({
-        index: 0,
-        routes: [{ name: 'Landing' }],
-      });
-    }
+      if (navigationRef.isReady()) {
+        navigationRef.reset({
+          index: 0,
+          routes: [{name: 'Landing'}],
+        });
+      }
 
       console.log('User logged out successfully');
     } catch (err) {
       console.error('Logout error:', err);
     }
   };
- if (loading) {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <SpinnerButton
-        // animationType="default"
-        animatedDuration={500}
-        rippleColor="rgba(255,255,255,0.3)"
-        spinnerColor="#AAAAAA"
-        // SpinnerType ="UIActivityIndicator"
-        isLoading={true}
-        onPress={()=>{}}
-        buttonStyle={{
-          paddingHorizontal:25,
-          paddingVertical:12,
-          borderRadius:10
-        }}
-      >
-      </SpinnerButton> 
-    </View>
-  );
-}
-
+  if (loading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <SpinnerButton
+          // animationType="default"
+          animatedDuration={500}
+          rippleColor="rgba(255,255,255,0.3)"
+          spinnerColor="#AAAAAA"
+          // SpinnerType ="UIActivityIndicator"
+          isLoading={true}
+          onPress={() => {}}
+          buttonStyle={{
+            paddingHorizontal: 25,
+            paddingVertical: 12,
+            borderRadius: 10,
+          }}></SpinnerButton>
+      </View>
+    );
+  }
 
   return (
-    <ConnectionContext.Provider value={{
-       sdk,
+    <ConnectionContext.Provider
+      value={{
+        sdk,
         provider,
         connected,
         connecting,
         chainId,
         account,
-         hasAttemptedConnect,
-     setHasAttemptedConnect,
-     connectStatus,
-     setconnectStatus,
-     hasAttemptedSign,
-     setHasAttemptedSign,
-     siwestatus,
-     setsiwestatus,
-     selectedAddress,
-     setselectedAddress,
+        hasAttemptedConnect,
+        setHasAttemptedConnect,
+        connectStatus,
+        setconnectStatus,
+        hasAttemptedSign,
+        setHasAttemptedSign,
+        siwestatus,
+        setsiwestatus,
+        selectedAddress,
+        setselectedAddress,
 
-     accessToken, 
-     wallet, 
-     loading,
-    logout,
-    setAccessToken,
-    setWallet,
-     }}>
+        accessToken,
+        wallet,
+        loading,
+        logout,
+        setAccessToken,
+        setWallet,
+      }}>
       {children}
     </ConnectionContext.Provider>
   );

@@ -28,6 +28,8 @@ import LastActivity from  './Home/LastActivity';
 
 import {useConnection} from '../contexts/ConnectionContext'
 import CurrentStatus from './Home/CurrentStatus'
+import {baseurl} from "./baseurl"
+console.log("baseurl",baseurl)
 console.log('Geolocation:', Geolocation);
 
 
@@ -111,9 +113,11 @@ const goNextWeek = () => {
     const Geolactionref = useRef(null);
       const socketRef = useRef(null);  
 
-      const CO2_ICE_g_per_km = 60.9 // took from the research papers of icct 
+      // const CO2_ICE_g_per_km = 60.9 // took from the research papers of icct 
+      const CO2_ICE_g_per_km = 190
+
     useEffect(() => {
-    socketRef.current = io('http://192.168.1.12:3001'); 
+    socketRef.current = io(`${baseurl}`); 
     socketRef.current.on('distanceUpdate', (dist) => {
       setDistanceKm(dist);
 
@@ -205,7 +209,7 @@ const displayWeekData = weekData.map(item => ({
 }));
 const fetchWeekData = async (weekStart, weekEnd) => {
   try {
-    const response = await fetch('http://192.168.1.12:3001/activity/week', {
+    const response = await fetch(`${baseurl}/activity/week`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -234,7 +238,7 @@ const fetchWeekData = async (weekStart, weekEnd) => {
 };
 async function fetchOverallData() {
   try {
-    const response = await fetch("http://192.168.1.12:3001/activity/overall", {
+    const response = await fetch(`${baseurl}/activity/overall`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -322,7 +326,7 @@ const maxBarValue = selectedMetric === 'co2'
               stopRecording();
  
 
-         const co2ThisSessionKg = (distanceKm * CO2_ICE_g_per_km) / 1000;
+         const co2ThisSessionKg = (distanceKm * CO2_ICE_g_per_km) / 1000; // 1km 0.19kg ,5km 1kg
               const today = new Date();  
               console.log(today) 
                const todayStr = today.toLocaleDateString();
@@ -340,7 +344,7 @@ const maxBarValue = selectedMetric === 'co2'
     });
 
      try {
-      const response = await fetch('http://192.168.1.12:3001/activity/save', {
+      const response = await fetch(`${baseurl}/activity/save`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,

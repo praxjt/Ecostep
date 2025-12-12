@@ -39,6 +39,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useConnection} from '../../contexts/ConnectionContext';
 import OrbitingCircles from '../../components/OrbitingCircles';
 import LinearGradient from 'react-native-linear-gradient';
+import { baseurl } from '../baseurl';
 
 const {height} = Dimensions.get('window');
 
@@ -176,10 +177,13 @@ console.log("checksumAddress",checksumAddress)
         setHasAttemptedConnect(true);
 
         const chainId = await provider.getChainId();
+        // const chainId = "0x13882"
+
+
         console.log(' await provider.getChainId(); :', chainId);
         setChainId(chainId);
         StoreChainId(chainId);
-        const res = await fetch('http://192.168.1.12:3001/connect', {
+        const res = await fetch(`${baseurl}/connect`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({address:address, chainId:parseInt(chainId, 16), role:"USER"}),
@@ -275,7 +279,7 @@ console.log("Stored SIWE message:", siweMessageRef.current);
 
       console.log("Signature received from MetaMask:", signature);
 
-      const verifyRes = await fetch('http://192.168.1.12:3001/siwe', {
+      const verifyRes = await fetch(`${baseurl}/siwe`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({message:  siweMessageRef.current, signature, }),

@@ -251,7 +251,7 @@ export default function MainTabs({route}) {
       </Tab.Navigator>
 
       {/* Modal for chain switch */}
-      <Modal visible={false} transparent animationType="fade">
+      <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.backdrop}>
           <View style={styles.modalBox}>
             <Text style={styles.title}>Unsupported Network</Text>
